@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:ocr_license_plate/utilities/dialogs/scan_from_dialog.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../constant/route.dart';
 import '../../enums/menu_item.dart';
 import '../../utilities/dialogs/logout_diaolog.dart';
@@ -47,8 +47,17 @@ class _PlateViewState extends State<PlateView> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: () {
-                    showScanFromDialog(context);
+                  onPressed: () async {
+                    Map<Permission, PermissionStatus> statuses = await [
+                      Permission.storage,
+                      Permission.camera,
+                    ].request();
+                    if (statuses[Permission.storage]!.isGranted &&
+                        statuses[Permission.camera]!.isGranted) {
+                      Navigator.of(context).pushNamed(scanViewRoute);
+                    } else {
+                      print('no permission provided');
+                    }
                   },
                   child: const Text('Scan Masuk'),
                 ),

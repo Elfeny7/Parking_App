@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ocr_license_plate/views/scan/scan_view.dart';
 import 'constant/route.dart';
 import 'views/plates/plates_view.dart';
 import 'views/auth/login_view.dart';
@@ -20,6 +21,7 @@ void main() {
         loginRoute: (context) => const LoginView(),
         registerRoute: (context) => const RegisterView(),
         verifyEmailRoute: (context) => const VerifyEmailView(),
+        scanViewRoute:(context) => const ScanView(),
       },
     ),
   );
