@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ocr_license_plate/constant/route.dart';
 
 class ScanView extends StatefulWidget {
   const ScanView({super.key});
@@ -27,34 +28,46 @@ class _ScanViewState extends State<ScanView> {
               const SizedBox(
                 height: 20.0,
               ),
-              ElevatedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return SimpleDialog(
-                        title: const Text('Choose Image From'),
-                        children: [
-                          SimpleDialogOption(
-                            child: const Text('Camera'),
-                            onPressed: () async {
-                              await _imgFromCamera();
-                              Navigator.pop(context);
-                            },
-                          ),
-                          SimpleDialogOption(
-                            child: const Text('Gallery'),
-                            onPressed: () async {
-                              await _imgFromGallery();
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return SimpleDialog(
+                            title: const Text('Choose Image From'),
+                            children: [
+                              SimpleDialogOption(
+                                child: const Text('Camera'),
+                                onPressed: () async {
+                                  await _imgFromCamera();
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              SimpleDialogOption(
+                                child: const Text('Gallery'),
+                                onPressed: () async {
+                                  await _imgFromGallery();
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          );
+                        },
                       );
                     },
-                  );
-                },
-                child: const Text('Take Photo'),
+                    child: const Text('Take Photo'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          scanResultViewRoute, (route) => false);
+                    },
+                    child: const Text('Scan'),
+                  ),
+                ],
               ),
               imageFile == null
                   ? Image.asset(
