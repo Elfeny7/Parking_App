@@ -63,7 +63,13 @@ class _PlateViewState extends State<PlateView> {
                 ),
                 ElevatedButton(
                   onPressed: () {},
-                  child: const Text('Keluar Parkir'),
+                  child: const Text('Keluar Parkir'  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(plateListRoute);
+                  },
+                  child: const Text('List Parked License'),
                 ),
               ],
             ),

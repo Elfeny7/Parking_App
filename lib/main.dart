@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ocr_license_plate/views/plates/plates_list_view.dart';
 import 'package:ocr_license_plate/views/scan/scan_view.dart';
 import 'constant/route.dart';
 import 'views/plates/plates_view.dart';
@@ -24,6 +25,7 @@ void main() {
         verifyEmailRoute: (context) => const VerifyEmailView(),
         scanViewRoute:(context) => const ScanView(),
         plateRoute: (context) => const PlateView(),
+        plateListRoute: (context) => const PlateListView(),
         scanResultViewRoute: (context) => const ScanResultView(),
       },
     ),

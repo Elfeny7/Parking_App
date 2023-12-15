@@ -12,4 +12,6 @@ class FirestoreServices {
   static Future<DocumentSnapshot> getResult(String id) async {
     return await results.doc(id).get();
   }
+
+  
 }

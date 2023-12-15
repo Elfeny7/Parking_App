@@ -1,6 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ocr_license_plate/constant/route.dart';
 import 'package:ocr_license_plate/services/firestore_services.dart';
+import 'package:ocr_license_plate/services/firestore_services_new.dart';
+
+import '../../utilities/dialogs/error_dialog.dart';
 
 class ScanResultView extends StatefulWidget {
   const ScanResultView({super.key});
@@ -10,7 +14,7 @@ class ScanResultView extends StatefulWidget {
 }
 
 class _ScanResultViewState extends State<ScanResultView> {
-  String textResult = 'AG 7988 EBS';
+  String scanResult = 'AG 7983 EB';
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +28,7 @@ class _ScanResultViewState extends State<ScanResultView> {
         child: Column(
           children: [
             const Text('Hasil Scan:'),
-            Text(textResult),
+            Text(scanResult),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -36,8 +40,19 @@ class _ScanResultViewState extends State<ScanResultView> {
                   child: const Text('Keluar'),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    FirestoreServices.createOrUpdateResult("1", textResult: textResult);
+                  onPressed: () async {
+                    final user = FirebaseAuth.instance.currentUser;
+                    if (user != null) {
+                      final uid = user.uid;
+                      await createResult(uid: uid, textResult: scanResult);
+                      Navigator.of(context)
+                        .pushNamedAndRemoveUntil(plateRoute, (route) => false);
+                    } else {
+                      await showErrorDialog(
+                        context,
+                        'User not found',
+                      );
+                    }
                   },
                   child: const Text('Simpan'),
                 ),
