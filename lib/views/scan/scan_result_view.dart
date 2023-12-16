@@ -37,7 +37,7 @@ class _ScanResultViewState extends State<ScanResultView> {
                     Navigator.of(context)
                         .pushNamedAndRemoveUntil(plateRoute, (route) => false);
                   },
-                  child: const Text('Keluar'),
+                  child: const Text('Cancel'),
                 ),
                 ElevatedButton(
                   onPressed: () async {
@@ -45,8 +45,8 @@ class _ScanResultViewState extends State<ScanResultView> {
                     if (user != null) {
                       final uid = user.uid;
                       await createResult(uid: uid, textResult: scanResult);
-                      Navigator.of(context)
-                        .pushNamedAndRemoveUntil(plateRoute, (route) => false);
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          plateRoute, (route) => false);
                     } else {
                       await showErrorDialog(
                         context,
@@ -54,7 +54,24 @@ class _ScanResultViewState extends State<ScanResultView> {
                       );
                     }
                   },
-                  child: const Text('Simpan'),
+                  child: const Text('Enter Parking'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final user = FirebaseAuth.instance.currentUser;
+                    if (user != null) {
+                      final uid = user.uid;
+                      await deleteResult(uid: uid, textResult: scanResult);
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          plateRoute, (route) => false);
+                    } else {
+                      await showErrorDialog(
+                        context,
+                        'User not found',
+                      );
+                    }
+                  },
+                  child: const Text('Exit Parking'),
                 ),
               ],
             ),

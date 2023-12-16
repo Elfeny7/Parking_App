@@ -54,16 +54,13 @@ class _PlateViewState extends State<PlateView> {
                     ].request();
                     if (statuses[Permission.storage]!.isGranted &&
                         statuses[Permission.camera]!.isGranted) {
-                      Navigator.of(context).pushNamed(scanViewRoute);
+                      Navigator.of(context)
+                          .pushNamed(scanViewRoute, arguments: {'in': true});
                     } else {
                       print('no permission provided');
                     }
                   },
-                  child: const Text('Scan Masuk'),
-                ),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: const Text('Keluar Parkir'  ),
+                  child: const Text('Scan License Number'),
                 ),
                 ElevatedButton(
                   onPressed: () {

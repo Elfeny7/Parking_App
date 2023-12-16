@@ -65,7 +65,7 @@ class _ScanViewState extends State<ScanView> {
                       Navigator.of(context).pushNamedAndRemoveUntil(
                           scanResultViewRoute, (route) => false);
                     },
-                    child: const Text('Scan'),
+                    child: const Text('Convert to Text'),
                   ),
                 ],
               ),
