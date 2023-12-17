@@ -1,8 +1,15 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ocr_license_plate/constant/route.dart';
+
+import '../../services/firestore_services_new.dart';
+import '../../utilities/dialogs/error_dialog.dart';
 
 class ScanView extends StatefulWidget {
   const ScanView({super.key});
@@ -14,6 +21,8 @@ class ScanView extends StatefulWidget {
 class _ScanViewState extends State<ScanView> {
   File? imageFile;
   bool isCameraSelected = true;
+  String ocrResult = '';
+  bool isButtonVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -61,26 +70,86 @@ class _ScanViewState extends State<ScanView> {
                     child: const Text('Take Photo'),
                   ),
                   ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                          scanResultViewRoute, (route) => false);
+                    onPressed: () async {
+                      await _scanImageFlask();
+                      if (ocrResult != '') {
+                        setState(
+                          () {
+                            isButtonVisible = true;
+                          },
+                        );
+                      }
                     },
-                    child: const Text('Convert to Text'),
+                    child: const Text('Scan Photo'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      await _scanImageMlkit();
+                      if (ocrResult != '') {
+                        setState(
+                          () {
+                            isButtonVisible = true;
+                          },
+                        );
+                      }
+                    },
+                    child: const Text('Scan Photo Offline'),
                   ),
                 ],
               ),
               imageFile == null
-                  ? Image.asset(
-                      'assets/default.png',
-                      height: 300.0,
-                      width: 300.0,
-                    )
+                  ? const Text('\nNo photo selected yet')
                   : Image.file(
                       imageFile!,
                     ),
               const SizedBox(
                 height: 20.0,
               ),
+              Text(ocrResult),
+              isButtonVisible == false
+                  ? const SizedBox(
+                      height: 20.0,
+                    )
+                  : Column(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () async {
+                            final user = FirebaseAuth.instance.currentUser;
+                            if (user != null) {
+                              final uid = user.uid;
+                              await createResult(
+                                  uid: uid, textResult: ocrResult);
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                  plateRoute, (route) => false);
+                            } else {
+                              await showErrorDialog(
+                                context,
+                                'User not found',
+                              );
+                            }
+                          },
+                          child: const Text('Enter Parking'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            final user = FirebaseAuth.instance.currentUser;
+                            if (user != null) {
+                              final uid = user.uid;
+                              await deleteResult(
+                                  uid: uid, textResult: ocrResult);
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                  plateRoute, (route) => false);
+                            } else {
+                              await showErrorDialog(
+                                context,
+                                'User not found',
+                              );
+                            }
+                          },
+                          child: const Text('Exit Parking'),
+                        ),
+                      ],
+                    ),
             ],
           ),
         ),
@@ -153,5 +222,47 @@ class _ScanViewState extends State<ScanView> {
       );
       // reload();
     }
+  }
+
+  Future<void> _scanImageFlask() async {
+    if (imageFile == null) {
+      return;
+    }
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('http://10.0.2.2:5000/api/ocr'));
+    request.files
+        .add(await http.MultipartFile.fromPath('image', imageFile!.path));
+    try {
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        var responseBody = await response.stream.toBytes();
+        var resultJson = json.decode(utf8.decode(responseBody));
+        var resultText = resultJson['result'];
+        setState(
+          () {
+            ocrResult = resultText;
+          },
+        );
+        print(resultText);
+      } else {
+        print('Request failed with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error sending request: $e');
+    }
+  }
+
+  Future<void> _scanImageMlkit() async {
+    if (imageFile == null) {
+      return;
+    }
+    final textRecognizer = TextRecognizer();
+    final inputImage = InputImage.fromFile(imageFile!);
+    final resultText = await textRecognizer.processImage(inputImage);
+    setState(
+      () {
+        ocrResult = resultText.text;
+      },
+    );
   }
 }

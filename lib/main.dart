@@ -10,8 +10,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuth, FirebaseAuthException;
-import 'views/scan/scan_result_view.dart';
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
@@ -26,7 +24,6 @@ void main() {
         scanViewRoute:(context) => const ScanView(),
         plateRoute: (context) => const PlateView(),
         plateListRoute: (context) => const PlateListView(),
-        scanResultViewRoute: (context) => const ScanResultView(),
       },
     ),
   );
