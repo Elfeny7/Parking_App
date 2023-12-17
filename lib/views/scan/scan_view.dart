@@ -19,10 +19,19 @@ class ScanView extends StatefulWidget {
 }
 
 class _ScanViewState extends State<ScanView> {
+  User? user;
+  String? uid;
   File? imageFile;
   bool isCameraSelected = true;
   String ocrResult = '';
-  bool isButtonVisible = false;
+  bool? isResultInDatabase;
+
+  @override
+  void initState() {
+    user = FirebaseAuth.instance.currentUser;
+    uid = user!.uid;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +43,6 @@ class _ScanViewState extends State<ScanView> {
         child: Center(
           child: Column(
             children: [
-              const SizedBox(
-                height: 20.0,
-              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -73,9 +79,11 @@ class _ScanViewState extends State<ScanView> {
                     onPressed: () async {
                       await _scanImageFlask();
                       if (ocrResult != '') {
+                        var checker =
+                            await resultChecker(uid: uid!, result: ocrResult);
                         setState(
                           () {
-                            isButtonVisible = true;
+                            isResultInDatabase = checker;
                           },
                         );
                       }
@@ -86,9 +94,11 @@ class _ScanViewState extends State<ScanView> {
                     onPressed: () async {
                       await _scanImageMlkit();
                       if (ocrResult != '') {
+                        var checker =
+                            await resultChecker(uid: uid!, result: ocrResult);
                         setState(
                           () {
-                            isButtonVisible = true;
+                            isResultInDatabase = checker;
                           },
                         );
                       }
@@ -106,50 +116,35 @@ class _ScanViewState extends State<ScanView> {
                 height: 20.0,
               ),
               Text(ocrResult),
-              isButtonVisible == false
+              ocrResult == ''
                   ? const SizedBox(
                       height: 20.0,
                     )
-                  : Column(
-                      children: [
-                        ElevatedButton(
+                  : isResultInDatabase == false
+                      ? ElevatedButton(
                           onPressed: () async {
-                            final user = FirebaseAuth.instance.currentUser;
                             if (user != null) {
-                              final uid = user.uid;
+                              final uid = user!.uid;
                               await createResult(
                                   uid: uid, textResult: ocrResult);
                               Navigator.of(context).pushNamedAndRemoveUntil(
                                   plateRoute, (route) => false);
-                            } else {
-                              await showErrorDialog(
-                                context,
-                                'User not found',
-                              );
                             }
                           },
                           child: const Text('Enter Parking'),
-                        ),
-                        ElevatedButton(
+                        )
+                      : ElevatedButton(
                           onPressed: () async {
-                            final user = FirebaseAuth.instance.currentUser;
                             if (user != null) {
-                              final uid = user.uid;
+                              final uid = user!.uid;
                               await deleteResult(
                                   uid: uid, textResult: ocrResult);
                               Navigator.of(context).pushNamedAndRemoveUntil(
                                   plateRoute, (route) => false);
-                            } else {
-                              await showErrorDialog(
-                                context,
-                                'User not found',
-                              );
                             }
                           },
                           child: const Text('Exit Parking'),
-                        ),
-                      ],
-                    ),
+                        )
             ],
           ),
         ),

@@ -59,3 +59,28 @@ Future<void> deleteResult(
     print('Error: $e');
   }
 }
+
+Future<bool> resultChecker(
+    {required String uid, required String result}) async {
+  try {
+    final docResult =
+        await FirebaseFirestore.instance.collection('results').doc(uid).get();
+
+    if (docResult.exists) {
+      final resultObject =
+          Result.fromJson(docResult.data() as Map<String, dynamic>);
+      final plateList = resultObject.resultList;
+
+      if (plateList.contains(result)) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  } catch (e) {
+    print('Error: $e');
+    return false;
+  }
+}
