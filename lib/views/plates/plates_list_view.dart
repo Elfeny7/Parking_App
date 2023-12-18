@@ -34,8 +34,8 @@ class _PlateListViewState extends State<PlateListView> {
           if (snapshot.hasError) {
             return Text('Something went wrong! ${snapshot.error}');
           } else if (snapshot.hasData) {
-            final result = snapshot.data;
-            return result == null
+            final result = snapshot.data!.resultList;
+            return result.isEmpty
                 ? const Center(
                     child: Text('No Result Yet'),
                   )

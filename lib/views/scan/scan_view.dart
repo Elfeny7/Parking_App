@@ -1,8 +1,15 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ocr_license_plate/constant/route.dart';
+
+import '../../services/firestore_services_new.dart';
+import '../../utilities/dialogs/error_dialog.dart';
 
 class ScanView extends StatefulWidget {
   const ScanView({super.key});
@@ -12,8 +19,20 @@ class ScanView extends StatefulWidget {
 }
 
 class _ScanViewState extends State<ScanView> {
+  User? user;
+  String? uid;
   File? imageFile;
   bool isCameraSelected = true;
+  String ocrResult = '';
+  bool? isResultInDatabase;
+  bool isResultLoading = false;
+
+  @override
+  void initState() {
+    user = FirebaseAuth.instance.currentUser;
+    uid = user!.uid;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +44,6 @@ class _ScanViewState extends State<ScanView> {
         child: Center(
           child: Column(
             children: [
-              const SizedBox(
-                height: 20.0,
-              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -61,26 +77,114 @@ class _ScanViewState extends State<ScanView> {
                     child: const Text('Take Photo'),
                   ),
                   ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                          scanResultViewRoute, (route) => false);
+                    onPressed: () async {
+                      setState(
+                        () {
+                          isResultLoading = true;
+                        },
+                      );
+                      try {
+                        await _scanImageFlask();
+                        if (ocrResult != '') {
+                          var checker =
+                              await resultChecker(uid: uid!, result: ocrResult);
+                          setState(
+                            () {
+                              isResultInDatabase = checker;
+                            },
+                          );
+                        }
+                      } finally {
+                        setState(
+                          () {
+                            isResultLoading = false;
+                          },
+                        );
+                      }
                     },
-                    child: const Text('Convert to Text'),
+                    child: isResultLoading
+                        ? const SizedBox(
+                            width: 15,
+                            height: 15,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text('Scan photo'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      await _scanImageMlkit();
+                      if (ocrResult != '') {
+                        var checker =
+                            await resultChecker(uid: uid!, result: ocrResult);
+                        setState(
+                          () {
+                            isResultInDatabase = checker;
+                          },
+                        );
+                      }
+                    },
+                    child: const Text('Scan Photo Offline'),
                   ),
                 ],
               ),
               imageFile == null
-                  ? Image.asset(
-                      'assets/default.png',
-                      height: 300.0,
-                      width: 300.0,
-                    )
+                  ? const Text('\nNo photo selected yet')
                   : Image.file(
                       imageFile!,
                     ),
               const SizedBox(
                 height: 20.0,
               ),
+              Text(ocrResult),
+              ocrResult == ''
+                  ? const SizedBox(
+                      height: 20.0,
+                    )
+                  : isResultInDatabase == false
+                      ? ElevatedButton(
+                          onPressed: () async {
+                            if (user != null) {
+                              await createResult(
+                                  uid: uid!, textResult: ocrResult);
+                              final snackBar = SnackBar(
+                                content:
+                                    const Text('Plate Parked Successfully '),
+                                action: SnackBarAction(
+                                  label: 'Ok',
+                                  onPressed: () {},
+                                ),
+                              );
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackBar);
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                  plateRoute, (route) => false);
+                            }
+                          },
+                          child: const Text('Enter Parking'),
+                        )
+                      : ElevatedButton(
+                          onPressed: () async {
+                            if (user != null) {
+                              await deleteResult(
+                                  uid: uid!, textResult: ocrResult);
+                              final snackBar = SnackBar(
+                                content:
+                                    const Text('Plate Exited Successfully'),
+                                action: SnackBarAction(
+                                  label: 'Ok',
+                                  onPressed: () {},
+                                ),
+                              );
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackBar);
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                  plateRoute, (route) => false);
+                            }
+                          },
+                          child: const Text('Exit Parking'),
+                        )
             ],
           ),
         ),
@@ -153,5 +257,47 @@ class _ScanViewState extends State<ScanView> {
       );
       // reload();
     }
+  }
+
+  Future<void> _scanImageFlask() async {
+    if (imageFile == null) {
+      return await showErrorDialog(context, 'No photo yet, can not scan');
+    }
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('http://ikmalfaris50.pythonanywhere.com/'));
+    request.files
+        .add(await http.MultipartFile.fromPath('image', imageFile!.path));
+    try {
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        var responseBody = await response.stream.toBytes();
+        var resultJson = json.decode(utf8.decode(responseBody));
+        var resultText = resultJson['result'];
+        setState(
+          () {
+            ocrResult = resultText;
+          },
+        );
+        print(resultText);
+      } else {
+        print('Request failed with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error sending request: $e');
+    }
+  }
+
+  Future<void> _scanImageMlkit() async {
+    if (imageFile == null) {
+      return await showErrorDialog(context, 'No photo yet, can not scan');
+    }
+    final textRecognizer = TextRecognizer();
+    final inputImage = InputImage.fromFile(imageFile!);
+    final resultText = await textRecognizer.processImage(inputImage);
+    setState(
+      () {
+        ocrResult = resultText.text;
+      },
+    );
   }
 }

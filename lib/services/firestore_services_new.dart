@@ -1,15 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-Future<void> createResult(
-    {required String uid, required String textResult}) async {
-  List<String> resultList = [];
-  resultList.add(textResult);
-
-  final docResult = FirebaseFirestore.instance.collection('results').doc(uid);
-  final result = Result(resultList: resultList);
-  final json = result.toJson();
-  await docResult.set(json, SetOptions(merge: true));
-}
 
 class Result {
   List<String> resultList;
@@ -24,6 +14,17 @@ class Result {
 
     return Result(resultList: stringList);
   }
+}
+
+Future<void> createResult(
+    {required String uid, required String textResult}) async {
+  List<String> resultList = [];
+  resultList.add(textResult);
+
+  final docResult = FirebaseFirestore.instance.collection('results').doc(uid);
+  final result = Result(resultList: resultList);
+  final json = result.toJson();
+  await docResult.set(json, SetOptions(merge: true));
 }
 
 Stream<List<Result>> readResults() => FirebaseFirestore.instance
@@ -57,5 +58,30 @@ Future<void> deleteResult(
     );
   } catch (e) {
     print('Error: $e');
+  }
+}
+
+Future<bool> resultChecker(
+    {required String uid, required String result}) async {
+  try {
+    final docResult =
+        await FirebaseFirestore.instance.collection('results').doc(uid).get();
+
+    if (docResult.exists) {
+      final resultObject =
+          Result.fromJson(docResult.data() as Map<String, dynamic>);
+      final plateList = resultObject.resultList;
+
+      if (plateList.contains(result)) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  } catch (e) {
+    print('Error: $e');
+    return false;
   }
 }
