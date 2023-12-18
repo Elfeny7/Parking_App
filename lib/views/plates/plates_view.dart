@@ -67,7 +67,7 @@ class _PlateViewState extends State<PlateView> {
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pushNamed(plateListRoute);
+                Navigator.of(context).pushNamed(plateHistoryRoute);
               },
               child: const Text('History Parked License'),
             ),

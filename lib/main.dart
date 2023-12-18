@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ocr_license_plate/views/plates/plates_history_view.dart';
 import 'package:ocr_license_plate/views/plates/plates_list_view.dart';
 import 'package:ocr_license_plate/views/scan/scan_view.dart';
 import 'constant/route.dart';
@@ -24,6 +25,7 @@ void main() {
         scanViewRoute:(context) => const ScanView(),
         plateRoute: (context) => const PlateView(),
         plateListRoute: (context) => const PlateListView(),
+        plateHistoryRoute: (context) => const PlateHistoryView(),
       },
     ),
   );

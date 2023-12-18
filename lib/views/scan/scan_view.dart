@@ -150,9 +150,9 @@ class _ScanViewState extends State<ScanView> {
                                   uid: uid!, textResult: ocrResult);
                               final snackBar = SnackBar(
                                 content:
-                                    const Text('Plate Parked Successfully '),
+                                    const Text('Plate parked successfully'),
                                 action: SnackBarAction(
-                                  label: 'Ok',
+                                  label: 'OK',
                                   onPressed: () {},
                                 ),
                               );
@@ -169,11 +169,13 @@ class _ScanViewState extends State<ScanView> {
                             if (user != null) {
                               await deleteResult(
                                   uid: uid!, textResult: ocrResult);
+                              await createHistory(
+                                  uid: uid!, textResult: ocrResult);
                               final snackBar = SnackBar(
                                 content:
-                                    const Text('Plate Exited Successfully'),
+                                    const Text('Plate exited and added to hisory'),
                                 action: SnackBarAction(
-                                  label: 'Ok',
+                                  label: 'OK',
                                   onPressed: () {},
                                 ),
                               );

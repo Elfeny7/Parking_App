@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
 class Result {
   List<String> resultList;
   Result({required this.resultList});
@@ -16,6 +15,21 @@ class Result {
   }
 }
 
+class History {
+  List<String> historyList;
+  History({required this.historyList});
+
+  Map<String, dynamic> toJson() => {
+        'plate_history': FieldValue.arrayUnion(historyList),
+      };
+  static History fromJson(Map<String, dynamic> json) {
+    List<dynamic> dynamicList = json['plate_history'];
+    List<String> stringList = List<String>.from(dynamicList);
+
+    return History(historyList: stringList);
+  }
+}
+
 Future<void> createResult(
     {required String uid, required String textResult}) async {
   List<String> resultList = [];
@@ -26,12 +40,6 @@ Future<void> createResult(
   final json = result.toJson();
   await docResult.set(json, SetOptions(merge: true));
 }
-
-Stream<List<Result>> readResults() => FirebaseFirestore.instance
-    .collection('results')
-    .snapshots()
-    .map((snapshot) =>
-        snapshot.docs.map((doc) => Result.fromJson(doc.data())).toList());
 
 Future<Result?> readResult({required String uid}) async {
   try {
@@ -61,6 +69,17 @@ Future<void> deleteResult(
   }
 }
 
+Future<void> createHistory(
+    {required String uid, required String textResult}) async {
+  List<String> historyList = [];
+  historyList.add(textResult);
+
+  final docHistory = FirebaseFirestore.instance.collection('history').doc(uid);
+  final history = History(historyList: historyList);
+  final json = history.toJson();
+  await docHistory.set(json, SetOptions(merge: true));
+}
+
 Future<bool> resultChecker(
     {required String uid, required String result}) async {
   try {
@@ -84,4 +103,25 @@ Future<bool> resultChecker(
     print('Error: $e');
     return false;
   }
+}
+
+Future<History?> readHistory({required String uid}) async {
+  try {
+    final docHistory =
+        FirebaseFirestore.instance.collection('history').doc(uid);
+    final snapshot = await docHistory.get();
+    if (snapshot.exists) {
+      return History.fromJson(snapshot.data()!);
+    } else {
+      return null;
+    }
+  } catch (e) {
+    print('Error: $e');
+  }
+}
+
+Future<void> clearHistory({required String uid}) async {
+  final docHistory = FirebaseFirestore.instance.collection('history').doc(uid);
+  final history = History(historyList: []);
+  await docHistory.set(history.toJson(), SetOptions(merge: false));
 }
