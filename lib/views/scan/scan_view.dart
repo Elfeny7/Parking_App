@@ -25,6 +25,7 @@ class _ScanViewState extends State<ScanView> {
   bool isCameraSelected = true;
   String ocrResult = '';
   bool? isResultInDatabase;
+  bool isResultLoading = false;
 
   @override
   void initState() {
@@ -76,20 +77,40 @@ class _ScanViewState extends State<ScanView> {
                     child: const Text('Take Photo'),
                   ),
                   ElevatedButton(
-                    onPressed: () async {
-                      await _scanImageFlask();
-                      if (ocrResult != '') {
-                        var checker =
-                            await resultChecker(uid: uid!, result: ocrResult);
+                      onPressed: () async {
                         setState(
                           () {
-                            isResultInDatabase = checker;
+                            isResultLoading = true;
                           },
                         );
-                      }
-                    },
-                    child: const Text('Scan Photo'),
-                  ),
+                        try {
+                          await _scanImageFlask();
+                          if (ocrResult != '') {
+                            var checker = await resultChecker(
+                                uid: uid!, result: ocrResult);
+                            setState(
+                              () {
+                                isResultInDatabase = checker;
+                              },
+                            );
+                          }
+                        } finally {
+                          setState(
+                            () {
+                              isResultLoading = false;
+                            },
+                          );
+                        }
+                      },
+                      child: isResultLoading
+                          ? SizedBox(
+                              width: 15,
+                              height: 15,
+                              child: const CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text('Scan photo')),
                   ElevatedButton(
                     onPressed: () async {
                       await _scanImageMlkit();
@@ -221,7 +242,7 @@ class _ScanViewState extends State<ScanView> {
 
   Future<void> _scanImageFlask() async {
     if (imageFile == null) {
-      return;
+      return await showErrorDialog(context, 'No photo yet, can not scan');
     }
     var request = http.MultipartRequest(
         'POST', Uri.parse('http://ikmalfaris50.pythonanywhere.com/'));
@@ -249,7 +270,7 @@ class _ScanViewState extends State<ScanView> {
 
   Future<void> _scanImageMlkit() async {
     if (imageFile == null) {
-      return;
+      return await showErrorDialog(context, 'No photo yet, can not scan');
     }
     final textRecognizer = TextRecognizer();
     final inputImage = InputImage.fromFile(imageFile!);
