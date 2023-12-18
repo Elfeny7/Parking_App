@@ -224,7 +224,7 @@ class _ScanViewState extends State<ScanView> {
       return;
     }
     var request = http.MultipartRequest(
-        'POST', Uri.parse('http://10.0.2.2:5000/api/ocr'));
+        'POST', Uri.parse('http://ikmalfaris50.pythonanywhere.com/'));
     request.files
         .add(await http.MultipartFile.fromPath('image', imageFile!.path));
     try {

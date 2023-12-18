@@ -39,35 +39,37 @@ class _PlateViewState extends State<PlateView> {
           )
         ],
       ),
-      body: SingleChildScrollView(
+      body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    Map<Permission, PermissionStatus> statuses = await [
-                      Permission.storage,
-                      Permission.camera,
-                    ].request();
-                    if (statuses[Permission.storage]!.isGranted &&
-                        statuses[Permission.camera]!.isGranted) {
-                      Navigator.of(context)
-                          .pushNamed(scanViewRoute, arguments: {'in': true});
-                    } else {
-                      print('no permission provided');
-                    }
-                  },
-                  child: const Text('Scan License Number'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(plateListRoute);
-                  },
-                  child: const Text('List Parked License'),
-                ),
-              ],
+            ElevatedButton(
+              onPressed: () async {
+                Map<Permission, PermissionStatus> statuses = await [
+                  Permission.storage,
+                  Permission.camera,
+                ].request();
+                if (statuses[Permission.storage]!.isGranted &&
+                    statuses[Permission.camera]!.isGranted) {
+                  Navigator.of(context)
+                      .pushNamed(scanViewRoute, arguments: {'in': true});
+                } else {
+                  print('no permission provided');
+                }
+              },
+              child: const Text('Scan License Number'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(plateListRoute);
+              },
+              child: const Text('List Parked License'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(plateListRoute);
+              },
+              child: const Text('History Parked License'),
             ),
           ],
         ),
