@@ -77,40 +77,41 @@ class _ScanViewState extends State<ScanView> {
                     child: const Text('Take Photo'),
                   ),
                   ElevatedButton(
-                      onPressed: () async {
-                        setState(
-                          () {
-                            isResultLoading = true;
-                          },
-                        );
-                        try {
-                          await _scanImageFlask();
-                          if (ocrResult != '') {
-                            var checker = await resultChecker(
-                                uid: uid!, result: ocrResult);
-                            setState(
-                              () {
-                                isResultInDatabase = checker;
-                              },
-                            );
-                          }
-                        } finally {
+                    onPressed: () async {
+                      setState(
+                        () {
+                          isResultLoading = true;
+                        },
+                      );
+                      try {
+                        await _scanImageFlask();
+                        if (ocrResult != '') {
+                          var checker =
+                              await resultChecker(uid: uid!, result: ocrResult);
                           setState(
                             () {
-                              isResultLoading = false;
+                              isResultInDatabase = checker;
                             },
                           );
                         }
-                      },
-                      child: isResultLoading
-                          ? SizedBox(
-                              width: 15,
-                              height: 15,
-                              child: const CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Text('Scan photo')),
+                      } finally {
+                        setState(
+                          () {
+                            isResultLoading = false;
+                          },
+                        );
+                      }
+                    },
+                    child: isResultLoading
+                        ? const SizedBox(
+                            width: 15,
+                            height: 15,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text('Scan photo'),
+                  ),
                   ElevatedButton(
                     onPressed: () async {
                       await _scanImageMlkit();
@@ -145,9 +146,18 @@ class _ScanViewState extends State<ScanView> {
                       ? ElevatedButton(
                           onPressed: () async {
                             if (user != null) {
-                              final uid = user!.uid;
                               await createResult(
-                                  uid: uid, textResult: ocrResult);
+                                  uid: uid!, textResult: ocrResult);
+                              final snackBar = SnackBar(
+                                content:
+                                    const Text('Plate Parked Successfully '),
+                                action: SnackBarAction(
+                                  label: 'Ok',
+                                  onPressed: () {},
+                                ),
+                              );
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackBar);
                               Navigator.of(context).pushNamedAndRemoveUntil(
                                   plateRoute, (route) => false);
                             }
@@ -157,9 +167,18 @@ class _ScanViewState extends State<ScanView> {
                       : ElevatedButton(
                           onPressed: () async {
                             if (user != null) {
-                              final uid = user!.uid;
                               await deleteResult(
-                                  uid: uid, textResult: ocrResult);
+                                  uid: uid!, textResult: ocrResult);
+                              final snackBar = SnackBar(
+                                content:
+                                    const Text('Plate Exited Successfully'),
+                                action: SnackBarAction(
+                                  label: 'Ok',
+                                  onPressed: () {},
+                                ),
+                              );
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackBar);
                               Navigator.of(context).pushNamedAndRemoveUntil(
                                   plateRoute, (route) => false);
                             }
