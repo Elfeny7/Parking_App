@@ -118,22 +118,29 @@ class _RegisterViewState extends State<RegisterView> {
                             }
                             if (!mounted) return;
                             Navigator.of(context).pushNamed(verifyEmailRoute);
-                          } on WeakPasswordAuthException {
-                            await showErrorDialog(
-                              context,
-                              'Weak Password',
-                            );
-                          } on EmailAlreadyInUseAuthException {
-                            await showErrorDialog(
-                              context,
-                              'Email is already in use',
-                            );
-                          } on InvalidEmailAuthException {
-                            await showErrorDialog(
-                              context,
-                              'Invalid email',
-                            );
-                          } on GenericAuthException {
+                          } on FirebaseAuthException catch (e) {
+                            if (e.code == 'weak-password') {
+                              await showErrorDialog(
+                                context,
+                                'Weak Password',
+                              );
+                            } else if (e.code == 'email-already-in-use') {
+                              await showErrorDialog(
+                                context,
+                                'Email is already in use',
+                              );
+                            } else if (e.code == 'invalid-email') {
+                              await showErrorDialog(
+                                context,
+                                'Invalid email',
+                              );
+                            } else {
+                              await showErrorDialog(
+                                context,
+                                'Failed to register',
+                              );
+                            }
+                          } catch (_) {
                             await showErrorDialog(
                               context,
                               'Failed to register',

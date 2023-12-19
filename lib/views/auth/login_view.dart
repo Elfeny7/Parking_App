@@ -116,17 +116,24 @@ class _LoginViewState extends State<LoginView> {
                                 (route) => false,
                               );
                             }
-                          } on UserNotFoundAuthException {
-                            await showErrorDialog(
-                              context,
-                              'User not found',
-                            );
-                          } on WrongPasswordAuthException {
-                            await showErrorDialog(
-                              context,
-                              'Wrong password',
-                            );
-                          } on GenericAuthException {
+                          } on FirebaseAuthException catch (e) {
+                            if (e.code == 'user-not-found') {
+                              await showErrorDialog(
+                                context,
+                                'User not found',
+                              );
+                            } else if (e.code == 'wrong-password') {
+                              await showErrorDialog(
+                                context,
+                                'Wrong password',
+                              );
+                            } else {
+                              await showErrorDialog(
+                                context,
+                                'Authentication Error',
+                              );
+                            }
+                          } catch (_) {
                             await showErrorDialog(
                               context,
                               'Authentication Error',
