@@ -1,6 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:ocr_license_plate/constant/route.dart';
 import 'package:ocr_license_plate/services/firestore_services_new.dart';
 
 Future<void> showDeleteHistoryDialog(
@@ -19,14 +17,24 @@ Future<void> showDeleteHistoryDialog(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: const Text('No'),
+            child: const Text(
+              'No',
+              style: TextStyle(color: Colors.black),
+            ),
           ),
           TextButton(
             onPressed: () async {
-              await clearHistory(uid: uid);
-              Navigator.of(context).pop();
+              try {
+                await clearHistory(uid: uid);
+                Navigator.of(context).pop();
+              } catch (e) {
+                print('Error clearing history: $e');
+              }
             },
-            child: const Text('Yes'),
+            child: const Text(
+              'Yes',
+              style: TextStyle(color: Colors.black),
+            ),
           ),
         ],
       );
