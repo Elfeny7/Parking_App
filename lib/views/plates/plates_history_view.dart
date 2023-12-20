@@ -35,14 +35,14 @@ class _PlateHistoryViewState extends State<PlateHistoryView> {
           return result.isEmpty
               ? const Center(
                   child: Text(
-                    'No Result Yet',
+                    'No History Yet',
                     style: TextStyle(
                       color: Colors.white,
                     ),
                   ),
                 )
               : Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(10.0),
@@ -68,7 +68,6 @@ class _PlateHistoryViewState extends State<PlateHistoryView> {
                                     onPressed: () async {
                                       try {
                                         await clearHistory(uid: uid);
-                                        Navigator.of(context).pop();
                                         final snackBar = SnackBar(
                                           content: const Text(
                                               'History deleted successfuly'),
@@ -80,6 +79,7 @@ class _PlateHistoryViewState extends State<PlateHistoryView> {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(snackBar);
                                         Navigator.of(context).pop();
+                                        setState(() {});
                                       } catch (e) {
                                         print('Error clearing history: $e');
                                       }
@@ -95,9 +95,8 @@ class _PlateHistoryViewState extends State<PlateHistoryView> {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)
-                          ),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8)),
                             backgroundColor:
                                 const Color.fromARGB(255, 39, 39, 39),
                             side: const BorderSide(
@@ -149,7 +148,7 @@ class _PlateHistoryViewState extends State<PlateHistoryView> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
-          tileColor: const  Color.fromARGB(255, 57, 57, 57),
+          tileColor: const Color.fromARGB(255, 57, 57, 57),
           contentPadding: const EdgeInsets.only(left: 20),
           title: Text(
             resultItem,

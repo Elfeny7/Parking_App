@@ -1,17 +1,25 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart';
 
 class Result {
   List<String> resultList;
-  Result({required this.resultList});
+  List<String> imageList;
+  Result({required this.resultList, required this.imageList});
 
   Map<String, dynamic> toJson() => {
         'plate': FieldValue.arrayUnion(resultList),
+        'plate_image': FieldValue.arrayUnion(imageList),
       };
   static Result fromJson(Map<String, dynamic> json) {
     List<dynamic> dynamicList = json['plate'];
+    List<dynamic> dynamicImageList = json['plate_image'];
     List<String> stringList = List<String>.from(dynamicList);
+    List<String> stringImageList = List<String>.from(dynamicImageList);
 
-    return Result(resultList: stringList);
+    return Result(resultList: stringList, imageList: stringImageList);
   }
 }
 
@@ -31,12 +39,14 @@ class History {
 }
 
 Future<void> createResult(
-    {required String uid, required String textResult}) async {
+    {required String uid, required String textResult, required String filePath}) async {
   List<String> resultList = [];
+  List<String> imageList = [];
   resultList.add(textResult);
+  imageList.add(filePath);
 
   final docResult = FirebaseFirestore.instance.collection('results').doc(uid);
-  final result = Result(resultList: resultList);
+  final result = Result(resultList: resultList, imageList: imageList);
   final json = result.toJson();
   await docResult.set(json, SetOptions(merge: true));
 }
@@ -52,6 +62,7 @@ Future<Result?> readResult({required String uid}) async {
     }
   } catch (e) {
     print('Error: $e');
+    return null;
   }
 }
 
@@ -117,6 +128,7 @@ Future<History?> readHistory({required String uid}) async {
     }
   } catch (e) {
     print('Error: $e');
+    return null;
   }
 }
 
@@ -124,4 +136,52 @@ Future<void> clearHistory({required String uid}) async {
   final docHistory = FirebaseFirestore.instance.collection('history').doc(uid);
   final history = History(historyList: []);
   await docHistory.set(history.toJson(), SetOptions(merge: false));
+}
+
+class ResultImage {
+  List<String> imageList;
+  ResultImage({required this.imageList});
+
+  Map<String, dynamic> toJson() => {
+        'plate_image': FieldValue.arrayUnion(imageList),
+      };
+  static ResultImage fromJson(Map<String, dynamic> json) {
+    List<dynamic> dynamicList = json['plate_image'];
+    List<String> stringList = List<String>.from(dynamicList);
+
+    return ResultImage(imageList: stringList);
+  }
+}
+
+Future<String?> uploadImage(
+    {required String uid, required String result, required File image}) async {
+  try {
+    UploadTask? uploadTask;
+    final path = 'plate_image/$uid/$result.jpg';
+    final file = File(image.path);
+    final ref = FirebaseStorage.instance.ref().child(path);
+    uploadTask = ref.putFile(file);
+    final snapshot = await uploadTask.whenComplete(() {});
+    final urlDownload = await snapshot.ref.getDownloadURL();
+    return urlDownload;
+  } catch (e) {
+    print('Error : $e');
+    return null;
+  }
+}
+
+Future<void> saveImage({required String uid, required String? filePath}) async {
+  try {
+    List<String> imageList = [];
+    imageList.add(filePath!);
+
+    final docResultImage =
+        FirebaseFirestore.instance.collection('results').doc(uid);
+    final resultImage = ResultImage(imageList: imageList);
+    final json = resultImage.toJson();
+
+    await docResultImage.set(json, SetOptions(merge: true));
+  } catch (e) {
+    print('Error : $e');
+  }
 }

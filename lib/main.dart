@@ -12,7 +12,7 @@ import 'views/auth/verify_email_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart'
-    show FirebaseAuth, FirebaseAuthException;
+    show FirebaseAuth;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +21,7 @@ void main() {
       title: 'September',
       theme: ThemeData(
         primarySwatch: Colors.yellow,
-        scaffoldBackgroundColor: Color.fromARGB(255, 39, 39, 39),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 39, 39, 39),
         fontFamily: 'Poppins',
       ),
       home: const SplashScreenView(),

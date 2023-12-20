@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:ocr_license_plate/views/plates/plates_history_view.dart';
 import 'package:ocr_license_plate/views/plates/plates_list_view.dart';
 import 'package:ocr_license_plate/views/scan/scan_view.dart';
-import '../constant/route.dart';
 import '../enums/menu_item.dart';
 import '../utilities/dialogs/logout_diaolog.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
@@ -59,30 +58,28 @@ class _LayoutViewState extends State<LayoutView> {
         items: [
           /// Home
           SalomonBottomBarItem(
-            icon: Icon(
-              Icons.camera_alt_outlined,
-            ),
-            title: Text("Scan"),
+            icon: const Icon(Icons.camera_alt_outlined),
+            title: const Text("Scan"),
             selectedColor: Colors.yellow,
           ),
 
           /// Likes
           SalomonBottomBarItem(
-            icon: Icon(Icons.list),
-            title: Text("List"),
+            icon: const Icon(Icons.list),
+            title: const Text("List"),
             selectedColor: Colors.pink,
           ),
 
           /// Search
           SalomonBottomBarItem(
-            icon: Icon(Icons.history),
-            title: Text("History"),
+            icon: const Icon(Icons.history),
+            title: const Text("History"),
             selectedColor: Colors.orange,
           ),
 
           SalomonBottomBarItem(
-            icon: Icon(Icons.group),
-            title: Text("About Us"),
+            icon: const Icon(Icons.group),
+            title: const Text("About Us"),
             selectedColor: Colors.green,
           ),
         ],

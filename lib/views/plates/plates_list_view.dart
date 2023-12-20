@@ -41,16 +41,17 @@ class _PlateListViewState extends State<PlateListView> {
                   ),
                 )
               : Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: ListView.builder(
+                  padding: const EdgeInsets.all(10.0),
+                  child: ListView.builder(
                     itemCount: snapshot.data!.resultList.length,
                     itemBuilder: (context, index) {
                       return buildUser(
                         snapshot.data!.resultList[index],
+                        snapshot.data!.imageList[index],
                       );
                     },
                   ),
-              );
+                );
         } else {
           return const Center(
             child: CircularProgressIndicator(),
@@ -60,17 +61,22 @@ class _PlateListViewState extends State<PlateListView> {
     );
   }
 
-  Widget buildUser(String resultItem) => Card(
+  Widget buildUser(String resultItem, String imageItem) => Card(
         margin: const EdgeInsets.all(5),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
         child: ListTile(
+          leading: Image.network(
+            imageItem,
+            width: 100,
+            fit: BoxFit.cover,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
-          tileColor: const  Color.fromARGB(255, 57, 57, 57),
-          contentPadding: const EdgeInsets.only(left: 20),
+          tileColor: const Color.fromARGB(255, 57, 57, 57),
+          contentPadding: const EdgeInsets.all(10),
           title: Text(
             resultItem,
             style: const TextStyle(
