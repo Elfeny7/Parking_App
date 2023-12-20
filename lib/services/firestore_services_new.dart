@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:path/path.dart';
 
 class Result {
   List<String> resultList;
@@ -39,7 +38,9 @@ class History {
 }
 
 Future<void> createResult(
-    {required String uid, required String textResult, required String filePath}) async {
+    {required String uid,
+    required String textResult,
+    required String filePath}) async {
   List<String> resultList = [];
   List<String> imageList = [];
   resultList.add(textResult);
@@ -70,9 +71,19 @@ Future<void> deleteResult(
     {required String uid, required String textResult}) async {
   try {
     final docResult = FirebaseFirestore.instance.collection('results').doc(uid);
+
+    DocumentSnapshot docSnapshot = await docResult.get();
+    Map<String, dynamic>? data = docSnapshot.data() as Map<String, dynamic>?;
+    int? index = data!['plate'].indexOf(textResult);
+
     await docResult.update(
       {
         'plate': FieldValue.arrayRemove([textResult])
+      },
+    );
+    await docResult.update(
+      {
+        'plate_image': FieldValue.arrayRemove([data['plate_image'][index]])
       },
     );
   } catch (e) {
