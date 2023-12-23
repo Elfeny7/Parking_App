@@ -15,7 +15,12 @@ Future<void> showErrorDialog(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: const Text('Ok'),
+            child: const Text(
+              'OK',
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
           ),
         ],
       );

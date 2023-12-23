@@ -14,3 +14,44 @@ class InvalidEmailAuthException implements Exception {}
 class GenericAuthException implements Exception {}
 
 class UserNotLoggedInAuthException implements Exception {}
+
+// // Register
+// } on WeakPasswordAuthException {
+//   await showErrorDialog(
+//     context,
+//     'Weak Password',
+//   );
+// } on EmailAlreadyInUseAuthException {
+//   await showErrorDialog(
+//     context,
+//     'Email is already in use',
+//   );
+// } on InvalidEmailAuthException {
+//   await showErrorDialog(
+//     context,
+//     'Invalid email',
+//   );
+// } on GenericAuthException {
+//   await showErrorDialog(
+//     context,
+//     'Failed to register',
+//   );
+// }
+
+// // Login
+// } on UserNotFoundAuthException {
+//   await showErrorDialog(
+//     context,
+//     'User not found',
+//   );
+// } on WrongPasswordAuthException {
+//   await showErrorDialog(
+//     context,
+//     'Wrong password',
+//   );
+// } on GenericAuthException {
+//   await showErrorDialog(
+//     context,
+//     'Authentication Error',
+//   );
+// }
