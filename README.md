@@ -1,3 +1,2 @@
-# ocr_license_plate
-
+# Parking app
 A new Flutter project.
