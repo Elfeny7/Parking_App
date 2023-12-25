@@ -387,7 +387,7 @@ class _ScanViewState extends State<ScanView> {
     final resultText = await textRecognizer.processImage(inputImage);
     setState(
       () {
-        ocrResult = resultText.text;
+        ocrResult = resultText.text.replaceAll('\n', ' ');
       },
     );
   }
