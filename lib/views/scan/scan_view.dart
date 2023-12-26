@@ -116,6 +116,14 @@ class _ScanViewState extends State<ScanView> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    const Color.fromARGB(255, 39, 39, 39),
+                                side: const BorderSide(
+                                  width: 3,
+                                  color: Colors.yellow,
+                                ),
+                              ),
                               onPressed: () async {
                                 setState(
                                   () {
@@ -149,7 +157,11 @@ class _ScanViewState extends State<ScanView> {
                                         color: Colors.black,
                                       ),
                                     )
-                                  : const Text('Scan photo'),
+                                  : const Text(
+                                      'Scan photo',
+                                      style: TextStyle(
+                                          color: Colors.yellow, fontSize: 15),
+                                    ),
                             ),
                             ElevatedButton(
                               onPressed: () async {
@@ -164,7 +176,19 @@ class _ScanViewState extends State<ScanView> {
                                   );
                                 }
                               },
-                              child: const Text('Scan Photo Offline'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    const Color.fromARGB(255, 39, 39, 39),
+                                side: const BorderSide(
+                                  width: 3,
+                                  color: Colors.yellow,
+                                ),
+                              ),
+                              child: const Text(
+                                'Scan Photo Offline',
+                                style: TextStyle(
+                                    color: Colors.yellow, fontSize: 15),
+                              ),
                             ),
                           ],
                         ),
