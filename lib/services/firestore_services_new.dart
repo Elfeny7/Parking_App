@@ -181,17 +181,11 @@ Future<String?> uploadImage(
   }
 }
 
-Future<void> saveImage({required String uid, required String? filePath}) async {
+Future<void> deleteImage({required String uid, required String result}) async {
   try {
-    List<String> imageList = [];
-    imageList.add(filePath!);
-
-    final docResultImage =
-        FirebaseFirestore.instance.collection('results').doc(uid);
-    final resultImage = ResultImage(imageList: imageList);
-    final json = resultImage.toJson();
-
-    await docResultImage.set(json, SetOptions(merge: true));
+    final path = 'plate_image/$uid/$result.jpg';
+    final ref = FirebaseStorage.instance.ref().child(path);
+    await ref.delete();
   } catch (e) {
     print('Error : $e');
   }

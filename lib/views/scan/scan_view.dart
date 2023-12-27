@@ -154,7 +154,7 @@ class _ScanViewState extends State<ScanView> {
                                       width: 15,
                                       height: 15,
                                       child: CircularProgressIndicator(
-                                        color: Colors.black,
+                                        color: Colors.yellow,
                                       ),
                                     )
                                   : const Text(
@@ -273,11 +273,13 @@ class _ScanViewState extends State<ScanView> {
                                   if (user != null) {
                                     await deleteResult(
                                         uid: uid!, textResult: ocrResult);
+                                    await deleteImage(
+                                        uid: uid!, result: ocrResult);
                                     await createHistory(
                                         uid: uid!, textResult: ocrResult);
                                     final snackBar = SnackBar(
                                       content: const Text(
-                                          'Plate exited and added to hisory'),
+                                          'Plate exited and added to history'),
                                       action: SnackBarAction(
                                         label: 'OK',
                                         onPressed: () {},
