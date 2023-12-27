@@ -116,6 +116,14 @@ class _ScanViewState extends State<ScanView> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    const Color.fromARGB(255, 39, 39, 39),
+                                side: const BorderSide(
+                                  width: 3,
+                                  color: Colors.yellow,
+                                ),
+                              ),
                               onPressed: () async {
                                 setState(
                                   () {
@@ -146,10 +154,14 @@ class _ScanViewState extends State<ScanView> {
                                       width: 15,
                                       height: 15,
                                       child: CircularProgressIndicator(
-                                        color: Colors.black,
+                                        color: Colors.yellow,
                                       ),
                                     )
-                                  : const Text('Scan photo'),
+                                  : const Text(
+                                      'Scan photo',
+                                      style: TextStyle(
+                                          color: Colors.yellow, fontSize: 15),
+                                    ),
                             ),
                             ElevatedButton(
                               onPressed: () async {
@@ -164,7 +176,19 @@ class _ScanViewState extends State<ScanView> {
                                   );
                                 }
                               },
-                              child: const Text('Scan Photo Offline'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    const Color.fromARGB(255, 39, 39, 39),
+                                side: const BorderSide(
+                                  width: 3,
+                                  color: Colors.yellow,
+                                ),
+                              ),
+                              child: const Text(
+                                'Scan Photo Offline',
+                                style: TextStyle(
+                                    color: Colors.yellow, fontSize: 15),
+                              ),
                             ),
                           ],
                         ),
@@ -249,11 +273,13 @@ class _ScanViewState extends State<ScanView> {
                                   if (user != null) {
                                     await deleteResult(
                                         uid: uid!, textResult: ocrResult);
+                                    await deleteImage(
+                                        uid: uid!, result: ocrResult);
                                     await createHistory(
                                         uid: uid!, textResult: ocrResult);
                                     final snackBar = SnackBar(
                                       content: const Text(
-                                          'Plate exited and added to hisory'),
+                                          'Plate exited and added to history'),
                                       action: SnackBarAction(
                                         label: 'OK',
                                         onPressed: () {},
@@ -387,7 +413,7 @@ class _ScanViewState extends State<ScanView> {
     final resultText = await textRecognizer.processImage(inputImage);
     setState(
       () {
-        ocrResult = resultText.text;
+        ocrResult = resultText.text.replaceAll('\n', ' ');
       },
     );
   }
