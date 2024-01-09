@@ -158,7 +158,7 @@ class _ScanViewState extends State<ScanView> {
                                       ),
                                     )
                                   : const Text(
-                                      'Scan photo',
+                                      'Scan Photo Flask',
                                       style: TextStyle(
                                           color: Colors.yellow, fontSize: 15),
                                     ),
@@ -185,7 +185,7 @@ class _ScanViewState extends State<ScanView> {
                                 ),
                               ),
                               child: const Text(
-                                'Scan Photo Offline',
+                                'Scan Photo Mlkit',
                                 style: TextStyle(
                                     color: Colors.yellow, fontSize: 15),
                               ),
